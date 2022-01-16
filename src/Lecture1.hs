@@ -50,7 +50,11 @@ Explanation: @sumOfSquares 3 4@ should be equal to @9 + 16@ and this
 is 25.
 -}
 -- DON'T FORGET TO SPECIFY THE TYPE IN HERE
-sumOfSquares x y = error "TODO!"
+
+-- I got the following warning not sure not to properly fix it
+-- Defaulting the following constraints to type ‘Integer’      (Integral b0)
+sumOfSquares :: Num a => a -> a -> a
+sumOfSquares x y = x^(2 :: Integer) + y^(2 :: Integer)
 
 {- | Implement a function that returns the last digit of a given number.
 
@@ -63,7 +67,8 @@ sumOfSquares x y = error "TODO!"
 
 -}
 -- DON'T FORGET TO SPECIFY THE TYPE IN HERE
-lastDigit n = error "lastDigit: Not implemented!"
+lastDigit :: Integral a => a -> a
+lastDigit n = abs n `mod` 10
 
 {- | Write a function that takes three numbers and returns the
 difference between the biggest number and the smallest one.
@@ -77,7 +82,11 @@ and 1 is the smallest, and 7 - 1 = 6.
 Try to use local variables (either let-in or where) to implement this
 function.
 -}
-minmax x y z = error "TODO"
+minmax :: (Num a, Ord a) => a -> a -> a -> a
+minmax x y z = maxNum - minNum
+    where
+        maxNum = maximum [x, y, z]
+        minNum = minimum [x, y, z]
 
 {- | Implement a function that takes a string, start and end positions
 and returns a substring of a given string from the start position to
@@ -94,7 +103,11 @@ start position can be considered as zero (e.g. substring from the
 first character) and negative end position should result in an empty
 string.
 -}
-subString start end str = error "TODO"
+-- What should I use Int or Integer? When do you use one over another? Integer for large numbers only?
+subString :: Int -> Int -> String -> String
+subString start end str | start < 0 = subString 0 end str
+                        | end < 0 = ""
+                        | otherwise = take (end - start + 1) (drop start str)
 
 {- | Write a function that takes a String — space separated numbers,
 and finds a sum of the numbers inside this string.
@@ -104,7 +117,8 @@ and finds a sum of the numbers inside this string.
 
 The string contains only spaces and/or numbers.
 -}
-strSum str = error "TODO"
+strSum :: String -> Int
+strSum str = sum $ map (read :: String -> Int) $ words str
 
 {- | Write a function that takes a number and a list of numbers and
 returns a string, saying how many elements of the list are strictly
@@ -119,4 +133,10 @@ and lower than 6 elements (4, 5, 6, 7, 8 and 9).
 
 🕯 HINT: Use recursion to implement this function.
 -}
-lowerAndGreater n list = error "TODO"
+lowerAndGreater :: Int -> [Int] -> String
+lowerAndGreater n list = helper n list 0 0
+    where
+        helper n [] greater lower = show n ++ " is greater than " ++ show greater ++ " elements and lower than " ++ show lower ++ " elements"
+        helper n (x:xs) greater lower | n > x = helper n xs (greater + 1) lower
+                                      | n < x = helper n xs greater (lower + 1)
+                                      | otherwise = helper n xs greater lower
