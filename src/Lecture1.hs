@@ -1,6 +1,5 @@
 {- |
-Module                  : Lecture1
-Copyright               : (c) 2021-2022 Haskell Beginners 2022 Course
+Module                  : Lecture1 Copyright               : (c) 2021-2022 Haskell Beginners 2022 Course
 SPDX-License-Identifier : MPL-2.0
 Maintainer              : Haskell Beginners 2022 Course <haskell.beginners2022@gmail.com>
 Stability               : Stable
@@ -35,6 +34,7 @@ module Lecture1
 its behaviour, possible types for the function arguments and write the
 type signature explicitly.
 -}
+makeSnippet :: Int -> String -> String
 makeSnippet limit text = take limit ("Description: " ++ text) ++ "..."
 
 {- | Implement a function that takes two numbers and finds sum of
@@ -134,9 +134,10 @@ and lower than 6 elements (4, 5, 6, 7, 8 and 9).
 🕯 HINT: Use recursion to implement this function.
 -}
 lowerAndGreater :: Int -> [Int] -> String
-lowerAndGreater n list = helper n list 0 0
+lowerAndGreater n list = helper list 0 0
     where
-        helper n [] greater lower = show n ++ " is greater than " ++ show greater ++ " elements and lower than " ++ show lower ++ " elements"
-        helper n (x:xs) greater lower | n > x = helper n xs (greater + 1) lower
-                                      | n < x = helper n xs greater (lower + 1)
-                                      | otherwise = helper n xs greater lower
+        helper :: [Int] -> Int -> Int -> String
+        helper [] greater lower = show n ++ " is greater than " ++ show greater ++ " elements and lower than " ++ show lower ++ " elements"
+        helper (x:xs) greater lower | n > x = helper xs (greater + 1) lower
+                                      | n < x = helper xs greater (lower + 1)
+                                      | otherwise = helper xs greater lower
