@@ -139,5 +139,5 @@ lowerAndGreater n list = helper list 0 0
         helper :: [Int] -> Int -> Int -> String
         helper [] greater lower = show n ++ " is greater than " ++ show greater ++ " elements and lower than " ++ show lower ++ " elements"
         helper (x:xs) greater lower | n > x = helper xs (greater + 1) lower
-                                      | n < x = helper xs greater (lower + 1)
-                                      | otherwise = helper xs greater lower
+                                    | n < x = helper xs greater (lower + 1)
+                                    | otherwise = helper xs greater lower
