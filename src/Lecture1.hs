@@ -54,7 +54,7 @@ is 25.
 -- I got the following warning not sure not to properly fix it
 -- Defaulting the following constraints to type ‘Integer’      (Integral b0)
 sumOfSquares :: Num a => a -> a -> a
-sumOfSquares x y = x^(2 :: Integer) + y^(2 :: Integer)
+sumOfSquares x y = x * x + y * y
 
 {- | Implement a function that returns the last digit of a given number.
 
@@ -118,7 +118,7 @@ and finds a sum of the numbers inside this string.
 The string contains only spaces and/or numbers.
 -}
 strSum :: String -> Int
-strSum str = sum $ map (read :: String -> Int) $ words str
+strSum str = sum $ map read $ words str
 
 {- | Write a function that takes a number and a list of numbers and
 returns a string, saying how many elements of the list are strictly
