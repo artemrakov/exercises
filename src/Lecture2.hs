@@ -250,11 +250,8 @@ True
 -}
 isIncreasing :: [Int] -> Bool
 isIncreasing [] = True
-isIncreasing (first:rest) = helper first rest
-  where
-    helper _ [] = True
-    helper value (x:xs) | value > x = False
-                        | otherwise = helper x xs
+isIncreasing [_] = True
+isIncreasing (x : y : ys) = x < y && isIncreasing (y : ys)
 
 {- | Implement a function that takes two lists, sorted in the
 increasing order, and merges them into new list, also sorted in the
@@ -270,8 +267,9 @@ verify that.
 merge :: [Int] -> [Int] -> [Int]
 merge xs [] = xs
 merge [] xs = xs
-merge list1@(x1:xs1) list2@(x2:xs2) | x1 > x2 = x2 : merge list1 xs2
-                                    | otherwise = x1 : merge xs1 list2
+merge list1@(x:xs) list2@(y:ys) | x > y = y : merge list1 ys
+                                | x == y = x : y : merge xs ys
+                                | otherwise = x : merge xs list2
 
 {- | Implement the "Merge Sort" algorithm in Haskell. The @mergeSort@
 function takes a list of numbers and returns a new list containing the
@@ -289,9 +287,10 @@ The algorithm of merge sort is the following:
 -}
 
 halve :: [a] -> ([a], [a])
-halve xs = splitAt mid xs
+halve [] = ([], [])
+halve (x:xs) = (x:evens, odds)
   where
-    mid = length xs `div` 2
+    (odds, evens) = halve xs
 
 mergeSort :: [Int] -> [Int]
 mergeSort list | length list < 2 = list
@@ -382,5 +381,20 @@ x + 45 + y
 Write a function that takes and expression and performs "Constant
 Folding" optimization on the given expression.
 -}
+
+
+collector :: Expr -> (Int, [Expr]) -> (Int, [Expr])
+collector (Lit num) (total, variables) = (total + num, variables)
+collector (Var var) (total, variables) = (total, Var var : variables)
+collector (Add expr1 expr2) (total, variables) = (total + fst (collector expr1 startingValues) + fst (collector expr2 startingValues), variables ++ snd (collector expr1 startingValues)  ++ snd (collector expr2 startingValues))
+  where
+    startingValues = (0, [])
+
 constantFolding :: Expr -> Expr
-constantFolding expr = expr
+constantFolding expr = case collector expr (0, []) of
+                            (0, []) -> Lit 0
+                            (0, [var]) -> var
+                            (total, []) -> Lit total
+                            (total, [var]) -> Add var (Lit total)
+                            (0, variables) -> foldr1 Add variables
+                            (total, variables) -> foldr1 Add (Lit total : variables)
