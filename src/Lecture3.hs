@@ -85,7 +85,7 @@ Tuesday
   'Ordering') and not just 'Weekday'?
 -}
 next :: (Enum a, Bounded a, Eq a) => a -> a
-next a | (maxBound `asTypeOf` a) == a = minBound `asTypeOf` a
+next a | maxBound == a = minBound
        | otherwise = succ a
 
 {- | Implement a function that calculates number of days from the first
