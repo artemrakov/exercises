@@ -35,7 +35,7 @@ module Lecture3
 
 -- VVV If you need to import libraries, do it after this line ... VVV
 import Data.List (nub)
-import Data.Foldable (fold, foldMap)
+import Data.Foldable (fold)
 import Debug.Trace (trace)
 -- ^^^ and before this line. Otherwise the test suite might fail  ^^^
 
@@ -137,7 +137,7 @@ data Reward = Reward
 instance Semigroup Reward where
   (<>) :: Reward -> Reward -> Reward
   a <> b = Reward { rewardGold = foldMap rewardGold [a, b]
-                  , rewardSpecial = all rewardSpecial [a, b]
+                  , rewardSpecial = any rewardSpecial [a, b]
                   }
 
 instance Monoid Reward where
@@ -205,8 +205,8 @@ together only different elements.
 Product {getProduct = 6}
 
 -}
-appendDiff3 :: (Monoid a, Eq a) => a -> a -> a -> a
-appendDiff3 x y z = fold $ nub [x, y, z]
+appendDiff3 :: (Semigroup a, Eq a) => a -> a -> a -> a
+appendDiff3 x y z = foldr1 (<>) $ nub [x, y, z]
 
 {-
 
@@ -240,8 +240,7 @@ types that can have such an instance.
 -- instance Foldable Reward where
 instance Foldable List1 where
   foldr :: (a -> b -> b) -> b -> List1 a -> b
-  foldr f acc (List1 x []) = f x acc
-  foldr f acc (List1 x (y:ys)) = foldr f (f y acc) (List1 x ys)
+  foldr f acc (List1 x xs) = foldr f (f x acc) xs
 
 instance Foldable Treasure where
   foldMap :: Monoid m => (a -> m) -> Treasure a -> m
