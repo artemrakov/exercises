@@ -137,7 +137,7 @@ data Reward = Reward
 instance Semigroup Reward where
   (<>) :: Reward -> Reward -> Reward
   a <> b = Reward { rewardGold = foldMap rewardGold [a, b]
-                  , rewardSpecial = foldr ((||) . rewardSpecial) False [a, b]
+                  , rewardSpecial = all rewardSpecial [a, b]
                   }
 
 instance Monoid Reward where
