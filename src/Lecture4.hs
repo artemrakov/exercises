@@ -343,7 +343,7 @@ displayStats stats = unlines content
       , "Total final balance    :" ++ " " ++ show (getSum $ statsTotalSum stats)
       , "Biggest absolute cost  :" ++ " " ++ show (getMax $ statsAbsoluteMax stats)
       , "Smallest absolute cost :" ++ " " ++ show (getMin $ statsAbsoluteMin stats)
-      , "Max earning            :" ++ " " ++ Data.Maybe.maybe "no value" (show . getMax) (statsSellMax stats)
+      , "Max earning            :" ++ " " ++ maybe "no value" (show . getMax) (statsSellMax stats)
       , "Min earning            :" ++ " " ++ Data.Maybe.maybe "no value" (show . getMin) (statsSellMin stats)
       , "Max spending           :" ++ " " ++ Data.Maybe.maybe "no value" (show . getMax) (statsBuyMax stats)
       , "Min spending           :" ++ " " ++ Data.Maybe.maybe "no value" (show . getMin) (statsBuyMin stats)
