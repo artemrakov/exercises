@@ -1,4 +1,6 @@
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE StrictData #-}
+{-# LANGUAGE BangPatterns #-}
 {- |
 Module                  : Lecture4
 Copyright               : (c) 2021-2022 Haskell Beginners 2022 Course
@@ -108,6 +110,8 @@ import Data.Char (isSpace)
 import Data.Maybe (maybe, mapMaybe)
 import System.Environment (getArgs)
 import Control.Monad (guard)
+import Data.Foldable (foldl', foldl1)
+
 
 {- In this exercise, instead of writing the entire program from
 scratch, you're offered to complete the missing parts.
@@ -234,16 +238,22 @@ The 'Stats' data type has multiple fields. All these fields have
 instance for the 'Stats' type itself.
 -}
 
+strictSemiGroupMaybe :: Semigroup a => Maybe a -> Maybe a -> Maybe a
+strictSemiGroupMaybe Nothing a = a
+strictSemiGroupMaybe a Nothing = a
+strictSemiGroupMaybe (Just !a) (Just !b) = Just (a <> b)
+
+
 instance Semigroup Stats where
   (<>) :: Stats -> Stats -> Stats
   a <> b = Stats { statsTotalPositions = statsTotalPositions a <> statsTotalPositions b
                  , statsTotalSum = statsTotalSum  a <> statsTotalSum b
                  , statsAbsoluteMax = statsAbsoluteMax a <> statsAbsoluteMax b
                  , statsAbsoluteMin = statsAbsoluteMin a <> statsAbsoluteMin b
-                 , statsSellMax = statsSellMax a <> statsSellMax b
-                 , statsSellMin = statsSellMin a <> statsSellMin b
-                 , statsBuyMax = statsBuyMax a <> statsBuyMax b
-                 , statsBuyMin = statsBuyMin a <> statsBuyMin b
+                 , statsSellMax = strictSemiGroupMaybe (statsSellMax a) (statsSellMax b)
+                 , statsSellMin = strictSemiGroupMaybe (statsSellMin a) (statsSellMin b)
+                 , statsBuyMax = strictSemiGroupMaybe (statsBuyMax a) (statsBuyMax b)
+                 , statsBuyMin = strictSemiGroupMaybe (statsBuyMin a) (statsBuyMin b)
                  , statsLongest = statsLongest a <> statsLongest b
                  }
 
@@ -306,7 +316,7 @@ implement the next task.
 -}
 
 combineRows :: NonEmpty Row -> Stats
-combineRows = sconcat . fmap rowToStats
+combineRows (x:|xs) = foldl' (\acc row -> acc <> rowToStats row) (rowToStats x) xs
 
 {-
 After we've calculated stats for all rows, we can then pretty-print
@@ -334,10 +344,10 @@ displayStats stats = unlines content
       , "Total final balance    :" ++ " " ++ show (getSum $ statsTotalSum stats)
       , "Biggest absolute cost  :" ++ " " ++ show (getMax $ statsAbsoluteMax stats)
       , "Smallest absolute cost :" ++ " " ++ show (getMin $ statsAbsoluteMin stats)
-      , "Max earning            :" ++ " " ++ maybe "no value" (show . getMax) (statsSellMax stats)
-      , "Min earning            :" ++ " " ++ maybe "no value" (show . getMin) (statsSellMin stats)
-      , "Max spending           :" ++ " " ++ maybe "no value" (show . getMax) (statsBuyMax stats)
-      , "Min spending           :" ++ " " ++ maybe "no value" (show . getMin) (statsBuyMin stats)
+      , "Max earning            :" ++ " " ++ Data.Maybe.maybe "no value" (show . getMax) (statsSellMax stats)
+      , "Min earning            :" ++ " " ++ Data.Maybe.maybe "no value" (show . getMin) (statsSellMin stats)
+      , "Max spending           :" ++ " " ++ Data.Maybe.maybe "no value" (show . getMax) (statsBuyMax stats)
+      , "Min spending           :" ++ " " ++ Data.Maybe.maybe "no value" (show . getMin) (statsBuyMin stats)
       , "Longest product name   :" ++ " " ++ unMaxLen (statsLongest stats)
       ]
 
@@ -361,7 +371,7 @@ the file doesn't have any products.
 calculateStats :: String -> String
 calculateStats input = case rows of [] -> "the file doesn't have any products"
                                     _ -> displayStats . combineRows . fromList $ rows
-  where rows = mapMaybe parseRow $ lines input
+  where rows = Data.Maybe.mapMaybe parseRow $ lines input
 
 
 {- The only thing left is to write a function with side-effects that
@@ -394,8 +404,6 @@ main :: IO ()
 main = do
   [filepath] <- getArgs
   printProductStats filepath
-
-
 
 {-
 And that's all!
