@@ -173,13 +173,12 @@ readMaybeNatural str = do
   pure n
 
 parseRow :: String -> Maybe Row
-parseRow string = case split ',' string of
-                    ["", _, _] -> Nothing
-                    [prod, trade, cost] -> do
-                                           t <- readTrade . dropSpaces $ trade
-                                           c <- readMaybeNatural cost
-                                           pure (Row prod t c)
-                    _ -> Nothing
+parseRow string = do
+    [prod, trade, cost] <- Just $ split ',' string
+    guard $ prod /= ""
+    t <- readMaybe trade
+    c <- readMaybeNatural cost
+    pure $ Row prod t c
 
 {-
 We have almost all we need to calculate final stats in a simple and
