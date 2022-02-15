@@ -238,9 +238,9 @@ instance for the 'Stats' type itself.
 -}
 
 strictSemiGroupMaybe :: Semigroup a => Maybe a -> Maybe a -> Maybe a
-strictSemiGroupMaybe Nothing a = a
-strictSemiGroupMaybe a Nothing = a
-strictSemiGroupMaybe (Just !a) (Just !b) = Just (a <> b)
+strictSemiGroupMaybe a b = case a <> b of
+    Nothing -> Nothing
+    Just !x -> Just x
 
 
 instance Semigroup Stats where
