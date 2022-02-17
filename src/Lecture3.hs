@@ -287,5 +287,5 @@ Just [8,9,10]
 [8,20,3]
 
 -}
-apply :: Functor f => a -> f (a -> b) -> f b
-apply a = fmap (\f -> f a)
+apply :: Applicative f => a -> f (a -> b) -> f b
+apply a f = f <*> pure a
